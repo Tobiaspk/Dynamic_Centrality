@@ -82,10 +82,16 @@ read_fst_data  <- function(user = 'tobias',
 
   path <- get_path(user)
 
-  df <- sapply(1:length(data_name), function(x)
-    read.fst(paste0(path, data_name[x], ".fst"),
-             columns = column_names[[x]]))
-  names(df) <- data_name
+  if(length(data_name == 1)){
+    df <- read.fst(paste0(path, data_name, ".fst"),
+                          columns = column_names) %>%
+      as.data.table
+  } else {
+    df <- sapply(1:length(data_name), function(x)
+      as.data.table(read.fst(paste0(path, data_name[x], ".fst"),
+                             columns = column_names[[x]])))
+    names(df) <- data_name
+  }
   return(df)
 
 }

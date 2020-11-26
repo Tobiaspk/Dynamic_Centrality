@@ -6,7 +6,7 @@
 #' @param save_path default NULL, if not NULL: save data under this path
 #' @return data of class data.table
 #' @export
-#' @import data.table fst
+#' @import data.table fst magrittr
 create_user_vote_user_data <- function(df_votes, df_posts, channels = NULL, save_path = NULL){
   ## choose only positive votes
   if("VotePositive" %in% colnames(df_votes)) {
