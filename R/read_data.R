@@ -97,6 +97,7 @@ read_fst_data  <- function(user = 'tobias',
          should be the same as length of data_name")
   }
 
+  path <- get_path(user)
   filenames <- paste0(path, data_name, ".fst")
 
   if(length(data_name == 1)){
