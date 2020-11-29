@@ -8,10 +8,14 @@
 #' @export
 #' @import data.table fst magrittr
 create_user_vote_user_data <- function(df_votes, df_posts, channels = NULL, save_path = NULL){
+  # copy required, else input data is manipulated
+  df_votes <- copy(df_votes)
+  df_posts <- copy(df_posts)
+
   ## choose only positive votes
   if("VotePositive" %in% colnames(df_votes)) {
-    df_votes <- df_votes[VotePositive == 1] %>%
-      .[, VotePositive := NULL]
+    df_votes <- df_votes[VotePositive == 1]
+    df_votes[, VotePositive := NULL]  # i think that must be in own row? (tobi)
   }
 
   ## change user-id name
@@ -19,8 +23,9 @@ create_user_vote_user_data <- function(df_votes, df_posts, channels = NULL, save
   setnames(df_posts, "ID_CommunityIdentity", "ID_PostUser")
 
   ## join data
-  df <- df_posts[df_votes, on = .(ID_Posting)] %>%
-    .[ID_VoteUser != ID_PostUser] # delete self-loops (however no self-loops)
+  df <- merge(df_posts, df_votes, by = "ID_Posting")
+  # delete self-loops (however no self-loops)
+  df <- df[ID_VoteUser != ID_PostUser]
 
   ## choose channel
   if(!is.null(channels)){

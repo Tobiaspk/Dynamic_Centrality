@@ -19,17 +19,16 @@ get_path <- function(user = 'tobias'){
 #' @param save_as_fst default FALSE, whether to save data in fst format or not
 #' fst-format very flexible: read specific rows and columns
 #' see more: http://www.fstpackage.org/
+#' @param return_df returns data only if true.
 #' @return data of class data.table in a list
 #' @export
 #' @import data.table fst
 read_csv_data <- function(user = 'tobias',
-                      data_names = c("Following", "Votes", "Postings"),
-                      save_as_fst = FALSE){
+                          data_names = c("Following", "Votes", "Postings"),
+                          save_as_fst = FALSE,
+                          return_df = TRUE){
   ## get path
   path <- get_path(user)
-
-  ## get file names
-  file_names <- list.files(path, pattern = ".csv", full.names = TRUE)
 
   ## columns to keep for the returning data
   colnames_to_keep <- c("ID_CommunityIdentity",
@@ -43,19 +42,37 @@ read_csv_data <- function(user = 'tobias',
                         "ArticlePublishingDate",
                         "PostingCreatedAt")
 
-  ## load data
-  ind <- sapply(data_names, function(x) grep(x, file_names))
-  df <- vector("list", length(data_names))
-  names(df) <- data_names
-  for(i in 1:length(ind)){
-    df[[i]] <- rbindlist(lapply(ind[[i]], function(x) fread(file_names[x])))
+  ## Temporary functions
+  # create paths to files
+  get_path_temp <- function(path, pattern)
+    paste0(path, grep_get(pattern, list.files(path, pattern = ".csv")))
 
-    if(save_as_fst){
-      write.fst(df[[i]], paste0(path, names(df)[i], ".fst"))
-    }
+  ## get paths to all files
+  pattern <- paste(data_names, collapse = "|")
+  paths <- get_path_temp(path = path, pattern = pattern)
+  # get "following", "votes" etc in correct ordert
+  path_names <- regmatches(temp, regexpr(pattern, temp))
 
-    df[[i]] <- df[[i]][, colnames(df[[i]]) %in% colnames_to_keep, with = FALSE]
+  ## read data using data.table
+  df <- lapply(paths, data.table::fread)
+  cat(paste0("Read Files:\n\t", paste(path_names, collapse = "\n\t"), "\n"))
+
+  ## save data to fst
+  if (save_as_fst) {
+    paths_save <- paste0(path, path_names, ".fst")
+    for (d in seq(df)) fst::write.fst(df[[d]], paths_save[d])
   }
+
+  ## update names
+  names(df) <- path_names
+
+  ## subset data
+  # should this really be here and not above "write.fst"?
+  for (d in path_names)
+    df[[d]] <- df[[d]][, colnames(df[[d]]) %in% colnames_to_keep, with = FALSE]
+
+  ## return nothing
+  if (!return_df) df <- NULL
 
   return(df)
 }
@@ -80,18 +97,20 @@ read_fst_data  <- function(user = 'tobias',
          should be the same as length of data_name")
   }
 
-  path <- get_path(user)
+  filenames <- paste0(path, data_name, ".fst")
 
   if(length(data_name == 1)){
-    df <- read.fst(paste0(path, data_name, ".fst"),
-                          columns = column_names) %>%
-      as.data.table
+    df <- fst::read.fst(path = filenames,
+                        columns = column_names,
+                        as.data.table = TRUE)
   } else {
-    df <- sapply(1:length(data_name), function(x)
-      as.data.table(read.fst(paste0(path, data_name[x], ".fst"),
-                             columns = column_names[[x]])))
-    names(df) <- data_name
+    df <- list()
+    for (i in 1:length(data_name)) {
+      df[[data_name[i]]] <- fst::read.fst(path = filenames[i],
+                                          columns = column_names[[i]],
+                                          as.data.table = TRUE)
+    }
   }
   return(df)
 
-}
+  }
