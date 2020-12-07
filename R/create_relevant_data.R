@@ -27,6 +27,17 @@ create_user_vote_user_data <- function(df_votes, df_posts, channels = NULL, save
   # delete self-loops (however no self-loops)
   df <- df[ID_VoteUser != ID_PostUser]
 
+  # create custom IDs, choose only date (not datetime) and subset data
+  users_uq <- unique(c(df$ID_PostUser, df$ID_VoteUser))
+  df <- df[, .(ID_Posting = map_id(ID_Posting),
+                ID_PostUser = map_id(ID_PostUser, levels = users_uq),
+                ID_VoteUser = map_id(ID_VoteUser, levels = users_uq),
+                ID_Article = map_id(ID_Article),
+                ArticleChannel = ArticleChannel,
+                VoteCreated = fastdate(VoteCreatedAt),
+                PostingCreated = fastdate(PostingCreatedAt),
+                ArticleCreated = fastdate(ArticlePublishingDate))]
+  
   ## choose channel
   if(!is.null(channels)){
     df <- df[ArticleChannel %in% channels]
