@@ -27,7 +27,7 @@ path_temp <- paste0(get_path(USER), "adj_mat_inv.rds") # set path
 B <- get_alphas(A = adj_mat, a = .3, path = path_temp) # calculate and store alphas to path (only once!)
 B <- readRDS(path_temp) # read from path
 
-
+# get dcm
 DCM <- dcm_simple(B = B)
 
 
