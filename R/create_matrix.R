@@ -12,9 +12,9 @@
 #' @return sparse adjency matrix
 #' @export
 
-create_adj_mat <- function(voter, poster, nrow, ncol = nrow) {
+create_adj_mat <- function(x, y, nrow, ncol = nrow) {
   mat <- Matrix::Matrix(0, nrow = nrow, ncol = ncol)
-  mat[cbind(voter, poster)] <- 1
+  mat[cbind(x, y)] <- 1
   return(mat)
 }
 
@@ -27,8 +27,10 @@ create_adj_mat <- function(voter, poster, nrow, ncol = nrow) {
 #'@param y ingoing column name
 #'
 
-create_adj_mat_time <- function(df, time_var,
-                                x = "ID_VoteUser", y = "ID_PostUser") {
+create_adj_mat_time <- function(df,
+                                time_var,
+                                x = "ID_VoteUser",
+                                y = "ID_PostUser") {
   # get unique ids
   users_uq <- unique(c(df[[x]], df[[y]]))
 
@@ -41,8 +43,8 @@ create_adj_mat_time <- function(df, time_var,
   # attention: dependent on local variables
   create_adj_mat_temp <- function(date) {
     sub <- df[df[[time_var]] == date]
-    return(create_adj_mat(voter = sub[[x]],
-                          poster = sub[[y]],
+    return(create_adj_mat(x = sub[[x]],
+                          y = sub[[y]],
                           nrow = n, ncol = n))
   }
 

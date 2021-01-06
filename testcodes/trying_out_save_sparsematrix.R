@@ -12,7 +12,7 @@ df_posts <- read_fst_data(user = "tine",
 ## merge data
 df <- create_user_vote_user_data(df_votes, df_posts, channels = "International") %>%
   .[, time := fasttime::fastPOSIXct(VoteCreatedAt)] %>% # add time variable
-  .[, .N, keyby = .(ID_VoteUser, ID_PostUser, yday(time))] # aggregate
+  .[, .N, keyby = .(ID_VoteUser, ID_PostUser, †(time))] # aggregate
 
 ## not efficient, to enable creating an adjacent matrix with rows/columns containing only zeros
 pretab <- rbindlist(list(df,

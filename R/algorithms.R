@@ -1,11 +1,21 @@
-#' Stores list of alpha centralities of list of adjacency matrices
+#'Get Alpha Centrality
+#'@param A Square adjacency matrix
+#'@param a penalty term
+#'
+alpha_centrality <- function(A, a) {
+  stopifnot(nrow(A) == ncol(A))
+  Unit <- Matrix::Diagonal(nrow(A))
+  return(solve(Unit - a*A))
+}
+
+#'Stores list of alpha centralities of list of adjacency matrices
 #'
 #'@param A is a list of adjacency matrices. Each adjacency matrix must be
 #'square
 #'@param a penalty term
 #'@return List of Alpha Centralities
 
-store_alpha <- function(A, a, path = NULL) {
+get_alphas <- function(A, a, path = NULL) {
   # input A must be type list
   n <- nrow(A[[1]])  # dimension of matrices
 
@@ -19,15 +29,19 @@ store_alpha <- function(A, a, path = NULL) {
   Unit <- Matrix::Diagonal(n)
 
   # alpha centrality for each adjacency matrix
+  cat("\rAlpha Centrality 0 /", length(A), " done.")
   for (i in seq(A)) {
-    cat("\rAlpha Centrality ", i, "/", length(A), " done.")
-    B[[i]] <- solve(Unit - a*A[[i]])
+    begin <- Sys.time()
+    B[[i]] <- alpha_centrality(A = A[[i]], a = a)
+    cat("\rAlpha Centrality ", i-1, "/", length(A), " done in ",
+        round(Sys.time() - begin, 1), ".")
   }
 
   if (!is.null(path)) saveRDS(object = B, file = path)
   return(B)
 }
 
+#'Dynamic Communicability Matrix (dcm)
 #'Input list of alpha centralities created using the function store_alpha(...)
 #'and calculates dynamic communicability matrices as described in "A matrix
 #'iteration for dynamic network summaries" by Grindrod, P. and Higham.
@@ -40,12 +54,20 @@ dcm_simple <- function(B) {
   # init output
   Q <- vector("list", k)
   Q[[1]] <- B[[1]]
-  if (k > 1)
-    for (i in 2:k)
+  if (k > 1) {
+    cat("\rDCM 1 /", length(B), " done.")
+    for (i in 2:k) {
+      begin <- Sys.time()
       Q[[i]] <- B[[i]] %*% Q[[i-1]]
+      cat("\rDCM ", i-1, "/", length(B), " done in ",
+          round(Sys.time() - begin, 1), ".")
+    }
+  }
+  return(Q)
 }
 
 
+#'Running Dynamic Communicability Matrix (RDCM)
 #'Input list of alpha centralities created using the function store_alpha(...)
 #'and parameter b to calculate running dynamic communicability matrices as described
 #'in "A matrix iteration for dynamic network summaries" by Grindrod, P. and Higham.
