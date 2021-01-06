@@ -25,30 +25,34 @@ create_adj_mat <- function(x, y, nrow, ncol = nrow) {
 #'@param time_var column name of time variable to use
 #'@param x outgoing column name
 #'@param y ingoing column name
-#'
+#'@return list of:
+#'  "matrix" - list of adjacency matrix at each time point
+#'  "mapping" - mapping for the user ids using mapping[user_id]
 
-create_adj_mat_time <- function(df,
+create_adj_mat_time <- function(df_input,
                                 time_var,
                                 x = "ID_VoteUser",
                                 y = "ID_PostUser") {
   # get unique ids
-  users_uq <- unique(c(df[[x]], df[[y]]))
+  users_uq <- unique(c(df_input[[x]], df_input[[y]]))
 
   # define setting: which time points and global users
-  time_points <- sort(unique(df[[time_var]]))
+  time_points <- sort(unique(df_input[[time_var]]))
   # dimension should be nxn where n is the number of unique users
-  n <- max(users_uq)
+  n <- length(users_uq)
+  mapping <- 1:n
+  names(mapping) <- users_uq
 
   # apply create_adj_mat to one time_points
   # attention: dependent on local variables
   create_adj_mat_temp <- function(date) {
-    sub <- df[df[[time_var]] == date]
-    return(create_adj_mat(x = sub[[x]],
-                          y = sub[[y]],
+    sub <- df_input[df_input[[time_var]] == date]
+    return(create_adj_mat(x = mapping[as.character(sub[[x]])],
+                          y = mapping[as.character(sub[[y]])],
                           nrow = n, ncol = n))
   }
 
   # create list of adjency matrices at each time point
   adj_mat <- lapply(time_points, create_adj_mat_temp)
-  return(adj_mat)
+  return(list(matrix = adj_mat, mapping = mapping))
 }

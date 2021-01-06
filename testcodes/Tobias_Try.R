@@ -40,7 +40,7 @@ plot_votes_per_day <- function(x, y) {
   # x ... time-point vector, y ... value vector
   plot(x, y, main = "Votes Per Day", type = "l", xlab = "date", ylab = "count votes")
   points(x, y, pch = 19, cex = 1, col = "white")
-  points(x, y, pch = 19, cex = .4) 
+  points(x, y, pch = 19, cex = .4)
 }
 plot_votes_per_day(time_points, y_n)
 
@@ -48,12 +48,13 @@ plot_votes_per_day(time_points, y_n)
 ###
 # store results by supplying a path
 # letztere Matrizen werden 5-10gb groß
-# for international takes ~20s / time point -> 5 minutes for 20 days 
+# for international takes ~20s / time point -> 5 minutes for 20 days
 path_temp <- paste0(get_path(USER), "adj_mat_inv.rds")
 #B <- get_alphas(A = adj_mat, a = .3, path = path_temp)
 B <- readRDS(path_temp)
 DCM <- dcm_simple(B = B)
-
+# check memory
+gc()
 
 ### Try 2
 path_temp <- paste0(get_path(USER), "adj_mat_inv.rds")
@@ -68,7 +69,7 @@ get_dcm_k <- function(B, k, path = NULL) {
       Q <- Q %*% B[[i]]
       cat("\rDCM ", i-1, "/", k, " done in ",
           round(Sys.time() - begin, 1), ".")
-    }    
+    }
   }
   return(Q)
 }

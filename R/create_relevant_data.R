@@ -37,7 +37,12 @@ create_user_vote_user_data <- function(df_votes, df_posts, channels = NULL, save
                 VoteCreated = fastdate(VoteCreatedAt),
                 PostingCreated = fastdate(PostingCreatedAt),
                 ArticleCreated = fastdate(ArticlePublishingDate))]
-  
+
+  # add weekly datest
+  df[, VoteCreatedWeek := format(fastdate(cut(df$VoteCreated, "week")), format = "%Y-%U")]
+  df[, PostingCreatedWeek := format(fastdate(cut(df$PostingCreated, "week")), format = "%Y-%U")]
+  df[, ArticleCreatedWeek := format(fastdate(cut(df$ArticleCreated, "week")), format = "%Y-%U")]
+
   ## choose channel
   if(!is.null(channels)){
     df <- df[ArticleChannel %in% channels]

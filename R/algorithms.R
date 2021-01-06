@@ -33,7 +33,7 @@ get_alphas <- function(A, a, path = NULL) {
   for (i in seq(A)) {
     begin <- Sys.time()
     B[[i]] <- alpha_centrality(A = A[[i]], a = a)
-    cat("\rAlpha Centrality ", i-1, "/", length(A), " done in ",
+    cat("\rAlpha Centrality ", i, "/", length(A), " done in ",
         round(Sys.time() - begin, 1), ".")
   }
 
@@ -55,11 +55,11 @@ dcm_simple <- function(B) {
   Q <- vector("list", k)
   Q[[1]] <- B[[1]]
   if (k > 1) {
-    cat("\rDCM 1 /", length(B), " done.")
+    cat("\rDCM 0 /", length(B), " done.")
     for (i in 2:k) {
       begin <- Sys.time()
       Q[[i]] <- B[[i]] %*% Q[[i-1]]
-      cat("\rDCM ", i-1, "/", length(B), " done in ",
+      cat("\rDCM ", i, "/", length(B), " done in ",
           round(Sys.time() - begin, 1), ".")
     }
   }
