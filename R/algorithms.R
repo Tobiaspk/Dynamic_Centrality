@@ -102,8 +102,8 @@ rdcm_simple <- function(B, b, dt) {
 #'
 #'an upper bound of largest eigenvalue should be used instead
 #'CN: hard to find one for our case: non-negative and asymmetric matrix (+non-regular graph)
-#'maybe Theorem 2.1 from https://www.sciencedirect.com/science/article/pii/S0024379513005405
-#'--> still have to look into that
+#'used Theorem 2.1 from https://www.sciencedirect.com/science/article/pii/S0024379513005405
+#'calculating an upper bound of spectral radius
 #'
 #'@param A list of adjacency matrices
 #'@param exact boolean, if TRUE the exact eigenvalues are calculated, else only the upper
@@ -120,7 +120,19 @@ get_upperbound_a <- function(A, exact = FALSE){
     max_spectralradius <- max(spectral_radius)
   } else {
 
+    spectral_radius <- numeric(length(A))
 
+    for(i in 1:length(A)){
+      cat("\rcalc upper bound for spectral radius of A[", i, "]")
+      tmp_rs <- sort(rowSums(A[[i]]), decreasing = TRUE)
+      tmp_phi <- numeric(length(tmp_rs))
+      ### since we have an adjacency matrix without self-loops, N = 1, M = 0
+      for(j in 1:length(tmp_rs)){
+        tmp_phi[j] <- tmp_rs[j]-1+sqrt((tmp_rs[j]+1)^2+4*sum(tmp_rs[1:(j-1)]-tmp_rs[j]))
+      }
+      spectral_radius[i] <- min(tmp_phi)
+    }
+    max_spectralradius <- min(spectral_radius)
   }
   return(1/max_spectralradius)
 }
