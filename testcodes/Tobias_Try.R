@@ -81,13 +81,5 @@ get_dcm_k <- function(B, k, path = NULL) {
 system.time(Q_k <- get_dcm_k(B, 7))
 
 # top international
-CHANNEL <- "International"
-SIZE <- "big"
-path <- paste0(get_path(USER), "userrank/userrank_", CHANNEL, "_", SIZE, "b.rds")
-temp<- readRDS(path)
-get_top_id(temp)
-
-plot_daily_votes(id = 2988, channel = CHANNEL, df = df)
-plot_daily_votes(id = 1902, channel = CHANNEL, df = df)
-plot_daily_votes(id = 11602, channel = CHANNEL, df = df)
-plot_daily_votes(id = 980, channel = CHANNEL, df = df)
+par(mfrow = c(4, 1), mar = c(1, 2, 3, 2))
+for (i in 1:4) plot_ranks(user = "tobias", channel = "Lifestyle", size = "small", time_point = i)
