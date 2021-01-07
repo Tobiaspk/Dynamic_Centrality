@@ -7,7 +7,8 @@
 read_csv_data(
   user = "tobias",
   data_names = c("Following", "Votes", "Postings"),
-  save_as_fst = FALSE
+  save_as_fst = FALSE,
+  return_df = TRUE
 )
 }
 \arguments{
@@ -18,6 +19,8 @@ read_csv_data(
 \item{save_as_fst}{default FALSE, whether to save data in fst format or not
 fst-format very flexible: read specific rows and columns
 see more: http://www.fstpackage.org/}
+
+\item{return_df}{returns data only if true.}
 }
 \value{
 data of class data.table in a list
