@@ -47,7 +47,7 @@ read_csv_data <- function(user = 'tobias',
   get_path_temp <- function(path, pattern) {
     paste0(path, grep_get(pattern, list.files(path, pattern = ".csv")))
   }
-  
+
   ## get paths to all files
   pattern <- paste(data_names, collapse = "|")
   paths <- get_path_temp(path = path, pattern = pattern)
@@ -56,7 +56,7 @@ read_csv_data <- function(user = 'tobias',
 
   ## read data using data.table
   df <- lapply(paths, data.table::fread)
-  cat(paste0("Read .csv Files:\n\t", paste(path_names, collapse = "\n\t - "), "\n"))
+  cat(paste0("Read .csv Files:\n\t - ", paste(path_names, collapse = "\n\t - "), "\n"))
 
   ## save data to fst
   if (save_as_fst) {
@@ -91,10 +91,10 @@ read_csv_data <- function(user = 'tobias',
 read_fst_data  <- function(user = 'tobias',
                              data_name = "Postings",
                              column_names = NULL){
-    
+
   path <- get_path(user)
   filename <- paste0(path, data_name, ".fst")
-  
+
   # create data if not yet exists
   if (!file.exists(filename)) {
     cat("Create fst Data.")
@@ -103,7 +103,7 @@ read_fst_data  <- function(user = 'tobias',
                   save_as_fst = TRUE,
                   return_df = FALSE)
   }
-    
+
   # read data
   cat("Reading Data.")
   df <- fst::read.fst(path = filename,
@@ -111,7 +111,7 @@ read_fst_data  <- function(user = 'tobias',
                       as.data.table = TRUE)
 
   return(df)
-  
+
   }
 
 
@@ -136,7 +136,7 @@ read_fst_data_old  <- function(user = 'tobias',
     stop("if more than one data should be loaded, length of column_names
          should be the same as length of data_name")
   }
-  
+
   path <- get_path(user)
   filenames <- paste0(path, data_name, ".fst")
 

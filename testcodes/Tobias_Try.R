@@ -5,8 +5,12 @@ library(Matrix)
 USER = "tobias"
 
 # read .fst
-votes <- read_fst_data(user = USER, data_name = "Votes")
-posts <- read_fst_data(user = USER, data_name = "Postings")
+votes01 <- read_fst_data(user = USER, data_name = "Votes_01")
+votes16 <- read_fst_data(user = USER, data_name = "Votes_16")
+posts01 <- read_fst_data(user = USER, data_name = "Postings_01")
+posts16 <- read_fst_data(user = USER, data_name = "Postings_16")
+votes <- rbind(votes01, votes16)
+posts <- rbind(posts01, posts16)
 
 # combine data
 # 1. Merge and Rename
@@ -75,3 +79,15 @@ get_dcm_k <- function(B, k, path = NULL) {
 }
 
 system.time(Q_k <- get_dcm_k(B, 7))
+
+# top international
+CHANNEL <- "International"
+SIZE <- "big"
+path <- paste0(get_path(USER), "userrank/userrank_", CHANNEL, "_", SIZE, "b.rds")
+temp<- readRDS(path)
+get_top_id(temp)
+
+plot_daily_votes(id = 2988, channel = CHANNEL, df = df)
+plot_daily_votes(id = 1902, channel = CHANNEL, df = df)
+plot_daily_votes(id = 11602, channel = CHANNEL, df = df)
+plot_daily_votes(id = 980, channel = CHANNEL, df = df)
