@@ -119,3 +119,23 @@ plot_value_time <- function(user, channel, size, df, ids = NULL, type = "value",
     points(x = timepoints, y = temp_val[i, ], pch = 8, col = cols[i], cex = 1)
   }
 }
+
+
+########
+plot_rank_sum <- function(user, channel = "Lifestyle",
+                          sizes = c("small", "big"), legend_names = c("b = 0.5", "b = 2")) {
+  m <- length(sizes)
+  cols = rainbow(m)
+  plot(0, 0, xlim = c(1, 5), ylim = c(0, 1),
+       xlab = "Timepoint", ylab = "||S[k]||", main = "Sum of Importance over time.")
+
+  for (i in 1:m) {
+    ranks_temp <- get_result(user = user, channel = channel, size = sizes[i])
+    cs_temp <- colSums(ranks_temp[, grepl("value", colnames(ranks_temp)), with = FALSE])
+    cs_temp <- cs_temp/max(cs_temp)
+    lines(1:5, cs_temp, col = cols[i])
+    points(1:5, cs_temp, col = "white", pch = 19, cex = 1.5)
+    points(1:5, cs_temp, col = cols[i], pch = 8)
+  }
+  legend("topleft", legend_names, pch = 8, col = cols)
+}

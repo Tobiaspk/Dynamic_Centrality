@@ -95,12 +95,18 @@ ranks <- get_result(user = "tobias", channel = channel, size = "small")
 dput(unique(get_top_id(ranks = ranks)))
 ids <- c(3799, 3745, 999)
 
-dev.new(width = 800, height = 800, unit = "px")
+dev.new(width = 500, height = 500, unit = "px")
 par(mfrow = c(2, 2), mar = c(1, 2, 3, 2))
 plot_value_time(user = "tobias", channel = "Lifestyle", size = "small", df = df, ids = ids)
 plot_value_time(user = "tobias", channel = "Lifestyle", size = "big", df = df, ids = ids)
 plot_value_time(user = "tobias", channel = "Lifestyle", size = "small", df = df, ids = ids, type = "rank", log = TRUE)
 plot_value_time(user = "tobias", channel = "Lifestyle", size = "big", df = df, ids = ids, type = "rank", log = TRUE)
+
+###
+
+plot_rank_sum(user = "tobias", channel = "Lifestyle",
+              sizes = c("small", "big"), legend_names = c("b = 0.5", "b = 2"))
+
 
 #### Presentation
 View(df[, .(ID_PostUser, ID_VoteUser, ID_Posting, ArticleChannel, PostingCreated, VoteCreated)])
