@@ -175,3 +175,13 @@ get_user_rank <- function(rdcm,
   colnames(users_rank) <- c("User_ID", paste0(c("value_t", "rank_t"), rep(1:length(rdcm), each = 2)))
   return(users_rank)
 }
+
+get_userrank_centrality <- function(df, mapping, tiesmethod = "average", var = "res"){
+  users_rank <- data.table(names(mapping))
+
+  for(i in 1:length(df)){
+    users_rank <- cbind(users_rank, unlist(df[[i]][eval(var)]), frank(-unlist(df[[i]][eval(var)]), ties.method = tiesmethod))
+  }
+  colnames(users_rank) <- c("User_ID", paste0(c("value_t", "rank_t"), rep(1:length(df), each = 2)))
+  return(users_rank)
+}

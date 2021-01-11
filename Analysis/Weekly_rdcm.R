@@ -1,6 +1,7 @@
 devtools::load_all()
 library(fasttime)
 library(Matrix)
+library(igraph)
 
 USER = "tine"
 
@@ -35,6 +36,17 @@ for (i in 1:length(channels)){
     next
   }
 
+  adj_mat_as_graphs<- lapply(adj_mat, graph.adjacency)
+  degree_cent <- lapply(adj_mat_as_graphs, centr_degree)
+  userrank_degree <- get_userrank_centrality(degree_cent, mapping)
+  saveRDS(userrank_degree, file = paste0(get_path(USER), "userrank_", channels[i], "_degree.rds"))
+  close_cent <- lapply(adj_mat_as_graphs, centr_clo)
+  userrank_close <- get_userrank_centrality(close_cent, mapping)
+  saveRDS(userrank_close, file = paste0(get_path(USER), "userrank_", channels[i], "_close.rds"))
+  eigen_cent <- lapply(adj_mat_as_graphs, centr_eigen)
+  userrank_eigen <- get_userrank_centrality(eigen_cent, mapping, var = "vector")
+  saveRDS(userrank_eigen, file = paste0(get_path(USER), "userrank_", channels[i], "_eigen.rds"))
+
   # get alphas
   path_temp <- paste0(get_path(USER), "adj_mat_inv_", channels[i], ".rds") # set path
 
@@ -43,6 +55,7 @@ for (i in 1:length(channels)){
   } else {
     B <- get_alphas(A = adj_mat, a = round(upperbounda, 3)-0.001, path = path_temp) # calculate and store alphas to path (only once!)
   }
+  dcm <- dcm_simple(B)
 
   rdcm_bigb <- rdcm_simple(B = B, b = 2, dt = rep(1,length(B)))
   if(any(sapply(rdcm_bigb, min) < 0)){
@@ -59,6 +72,8 @@ for (i in 1:length(channels)){
   saveRDS(userrank_bigb, file = paste0(get_path(USER), "userrank_", channels[i], "_bigb.rds"))
   userrank_smallb <- get_user_rank(rdcm_smallb, mappings = mapping)
   saveRDS(userrank_smallb, file = paste0(get_path(USER), "userrank_", channels[i], "_smallb.rds"))
+  userrank_dcm <- get_user_rank(dcm, mappings = mapping)
+  saveRDS(userrank_dcm, file = paste0(get_path(USER), "userrank_", channels[i], "_dcm.rds"))
 }
 
 
@@ -83,6 +98,8 @@ for (i in 1:length(problematic_channels)){
   adj_mat <- adj_mat_time$matrix
   mapping <- adj_mat_time$mapping
 
+
+
   upperbounda <- get_upperbound_a(adj_mat)
   cat("upper bound:", upperbounda, "\n")
 
@@ -90,6 +107,17 @@ for (i in 1:length(problematic_channels)){
     problematic_channels_new <- c(problematic_channels_new, problematic_channels[i])
     next
   }
+
+  adj_mat_as_graphs<- lapply(adj_mat, graph.adjacency)
+  degree_cent <- lapply(adj_mat_as_graphs, centr_degree)
+  userrank_degree <- get_userrank_centrality(degree_cent, mapping)
+  saveRDS(userrank_degree, file = paste0(get_path(USER), "userrank_", problematic_channels[i], "_degree.rds"))
+  close_cent <- lapply(adj_mat_as_graphs, centr_clo)
+  userrank_close <- get_userrank_centrality(close_cent, mapping)
+  saveRDS(userrank_close, file = paste0(get_path(USER), "userrank_", problematic_channels[i], "_close.rds"))
+  eigen_cent <- lapply(adj_mat_as_graphs, centr_eigen)
+  userrank_eigen <- get_userrank_centrality(eigen_cent, mapping, var = "vector")
+  saveRDS(userrank_eigen, file = paste0(get_path(USER), "userrank_", problematic_channels[i], "_eigen.rds"))
 
   # get alphas
   path_temp <- paste0(get_path(USER), "adj_mat_inv_", problematic_channels[i], ".rds") # set path
@@ -99,7 +127,7 @@ for (i in 1:length(problematic_channels)){
   } else {
     B <- get_alphas(A = adj_mat, a = round(upperbounda, 3)-0.001, path = path_temp) # calculate and store alphas to path (only once!)
   }
-
+  dcm <- dcm_simple(B)
   rdcm_bigb <- rdcm_simple(B = B, b = 2, dt = rep(1,length(B)))
   if(any(sapply(rdcm_bigb, min) < 0)){
     stop("negative values in RDCM!")
@@ -115,4 +143,6 @@ for (i in 1:length(problematic_channels)){
   saveRDS(userrank_bigb, file = paste0(get_path(USER), "userrank_", problematic_channels[i], "_bigb.rds"))
   userrank_smallb <- get_user_rank(rdcm_smallb, mappings = mapping)
   saveRDS(userrank_smallb, file = paste0(get_path(USER), "userrank_", problematic_channels[i], "_smallb.rds"))
+  userrank_dcm <- get_user_rank(dcm, mappings = mapping)
+  saveRDS(userrank_dcm, file = paste0(get_path(USER), "userrank_", problematic_channels[i], "_dcm.rds"))
 }
