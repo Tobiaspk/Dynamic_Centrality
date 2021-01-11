@@ -81,5 +81,38 @@ get_dcm_k <- function(B, k, path = NULL) {
 system.time(Q_k <- get_dcm_k(B, 7))
 
 # top international
+dev.new(width = 800, height = 800, unit = "px")
 par(mfrow = c(4, 1), mar = c(1, 2, 3, 2))
-for (i in 1:4) plot_ranks(user = "tobias", channel = "Lifestyle", size = "small", time_point = i)
+for (i in 1:4) plot_ranks(user = "tobias", channel = "Lifestyle",
+                          size = "small", time_point = i, df = df)
+
+dev.new(width = 800, height = 800, unit = "px")
+par(mfrow = c(4, 1), mar = c(1, 2, 3, 2))
+for (i in 1:4) plot_ranks(user = "tobias", channel = "Lifestyle",
+                          size = "big", time_point = i, df = df)
+
+ranks <- get_result(user = "tobias", channel = channel, size = "small")
+dput(unique(get_top_id(ranks = ranks)))
+ids <- c(3799, 3745, 999)
+
+dev.new(width = 800, height = 800, unit = "px")
+par(mfrow = c(2, 2), mar = c(1, 2, 3, 2))
+plot_value_time(user = "tobias", channel = "Lifestyle", size = "small", df = df, ids = ids)
+plot_value_time(user = "tobias", channel = "Lifestyle", size = "big", df = df, ids = ids)
+plot_value_time(user = "tobias", channel = "Lifestyle", size = "small", df = df, ids = ids, type = "rank", log = TRUE)
+plot_value_time(user = "tobias", channel = "Lifestyle", size = "big", df = df, ids = ids, type = "rank", log = TRUE)
+
+#### Presentation
+View(df[, .(ID_PostUser, ID_VoteUser, ID_Posting, ArticleChannel, PostingCreated, VoteCreated)])
+# unique post/voters per channel
+uniques <- df[, tapply(c(ID_PostUser, ID_VoteUser), c(ArticleChannel, ArticleChannel), function(x) length(unique(x)))]
+sort(uniques)
+# object size
+n <- length(unique(c(df$ID_PostUser, df$ID_VoteUser)))
+a <- create_adj_mat(x = df$ID_PostUser,
+                    y = df$ID_VoteUser,
+                    nrow = n, ncol = n)
+# most votes
+temp <- df[ArticleChannel == "Lifestyle", .(n = .N), by = list(ID_PostUser, VoteCreatedWeek)]
+temp[VoteCreatedWeek == "2019-18"][order(-n)]
+temp[VoteCreatedWeek == "2019-19"][order(-n)]
