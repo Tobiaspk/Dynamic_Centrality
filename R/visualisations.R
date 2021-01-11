@@ -49,8 +49,11 @@ plot_daily_votes <- function(id, channel, ranks, df, main = NULL) {
   axis(4, scaling * axis_mult, labels = round(scaling_loc * axis_mult, 1), cex.axis = .65)
   for (i in 1:(length(weeks)-1)) {
     polygon(c(weeks[i], weeks[i+1], weeks[i+1], weeks[i]),
-            c(-10, -10, max(y)*2, max(y)*2),
-            col = cols[i])
+            c(-10, -10, max(y)*2, max(y)*2))#,
+            #col = cols[i])
+    if(i == (length(weeks)-1)){
+      break
+    }
     lines(c(weeks[i], weeks[i+1]),
           c(q95_scaled[i], q95_scaled[i]),
           type = "lv", col = "grey70")
@@ -59,9 +62,9 @@ plot_daily_votes <- function(id, channel, ranks, df, main = NULL) {
           type = "l", lty = 2, col = "grey80")
     lines(c(weeks[i], weeks[i+1]),
           c(q100_scaled[i], q100_scaled[i]),
-          type = "l", lty = 3, col = "red")
+          type = "l", lty = 4, col = "red")
     lines(c(weeks[i], weeks[i+1]),
-          c(qid_scaled[i], qid_scaled[i]),
+          c(qid_scaled[,i, with = F], qid_scaled[,i, with = F]),
           type = "l", lty = 3, col = "green")
   }
   lines(x, y)
